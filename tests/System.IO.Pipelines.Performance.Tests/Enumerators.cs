@@ -20,11 +20,11 @@ namespace System.IO.Pipelines.Performance.Tests
         public virtual int ReadableBufferReader()
         {
             var reader = new ReadableBufferReader(_readableBuffer); ;
-            int ch;
+            byte ch;
             do
             {
                 ch = reader.Take();
-            } while (ch != -1);
+            } while (!reader.End);
             return ch;
         }
 

@@ -1,6 +1,7 @@
 ﻿// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using BenchmarkDotNet.Running;
 
@@ -12,10 +13,37 @@ namespace System.IO.Pipelines.Performance.Tests
         {
             var reading = new Reading();
             reading.Setup();
+            var stopwatch = new Stopwatch();
 
-            reading.ReadableBufferReader();
-            reading.MemoryIteratorWithPointer();
-            reading.MemoryIteratorWithIndexer();
+            var cnt = 1000;
+                
+            stopwatch.Start();
+            for (int i = 0; i < cnt; i++)
+            {
+                reading.ReadableBufferReader();
+            }
+            stopwatch.Stop();
+            Console.WriteLine(nameof(reading.ReadableBufferReader) + " " + stopwatch.ElapsedMilliseconds);
+
+
+            stopwatch.Restart();
+            for (int i = 0; i < cnt; i++)
+            {
+                reading.MemoryIteratorWithIndexer();
+            }
+            stopwatch.Stop();
+            Console.WriteLine(nameof(reading.MemoryIteratorWithIndexer) + " " + stopwatch.ElapsedMilliseconds);
+
+
+            stopwatch.Restart();
+            for (int i = 0; i < cnt; i++)
+            {
+                reading.MemoryIteratorWithPointer();
+            }
+            stopwatch.Stop();
+            Console.WriteLine(nameof(reading.MemoryIteratorWithPointer) + " " + stopwatch.ElapsedMilliseconds);
+            
+
             return;
 
             var options = (uint[]) Enum.GetValues(typeof(BenchmarkType));

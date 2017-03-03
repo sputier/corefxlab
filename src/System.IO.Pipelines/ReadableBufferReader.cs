@@ -59,7 +59,7 @@ namespace System.IO.Pipelines
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Take()
+        public byte Take()
         {
             var value = _currentSpan[_index];
 
@@ -67,11 +67,6 @@ namespace System.IO.Pipelines
 
             if (_index >= _currentSpan.Length)
             {
-                if (_end)
-                {
-                    return -1;
-                }
-
                 MoveNext();
             }
 
