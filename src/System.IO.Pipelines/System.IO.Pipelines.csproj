@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <Import Project="..\..\tools\common.props" />
   <PropertyGroup>
+    <DebugType>full</DebugType>
     <Description>An abstraction for doing efficient asynchronous IO</Description>
     <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>

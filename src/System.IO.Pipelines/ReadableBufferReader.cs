@@ -31,7 +31,7 @@ namespace System.IO.Pipelines
 
         public bool End => _end;
 
-        public int Index => _overallIndex;
+        public int Index => _overallIndex + _index;
 
         public ReadCursor Cursor
         {
@@ -61,15 +61,17 @@ namespace System.IO.Pipelines
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Take()
         {
-            var value = Peek();
-            if (!_end)
-            {
-                _index++;
-                _overallIndex++;
-            }
+            var value = _currentSpan[_index];
+
+            _index++;
 
             if (_index >= _currentSpan.Length)
             {
+                if (_end)
+                {
+                    return -1;
+                }
+
                 MoveNext();
             }
 
@@ -84,11 +86,13 @@ namespace System.IO.Pipelines
                 {
                     var part = _enumerator.Current;
                     _currentSpan = part.Segment.Memory.Span.Slice(part.Start, part.Length);
+                    _overallIndex += _index;
                     _index = 0;
                     return;
                 }
             }
-
+            _currentSpan = new Span<byte>(new byte[1]);
+            _index = 0;
             _end = true;
         }
 

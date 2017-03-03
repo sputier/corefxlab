@@ -3,6 +3,7 @@
 
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Engines;
+using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Validators;
 
@@ -23,6 +24,7 @@ namespace System.IO.Pipelines.Performance.Tests
                 .WithLaunchCount(3)
                 .WithWarmupCount(5)
                 .WithTargetCount(10));
+            Add(CsvMeasurementsExporter.Default);
         }
     }
 }

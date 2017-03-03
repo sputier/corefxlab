@@ -1,32 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
+    <DebugType>full</DebugType>
+    <NetCoreAppImplicitPackageVersion>2.0.0-beta-001651-00</NetCoreAppImplicitPackageVersion>
+    <RuntimeFrameworkVersion>2.0.0-beta-001651-00</RuntimeFrameworkVersion>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputType>Exe</OutputType>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <AssemblyOriginatorKeyFile>../../tools/test_key.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <Description></Description>
+    <Description>
+    </Description>
     <Copyright>Microsoft Corporation, All rights reserved</Copyright>
-    <PackageTags></PackageTags>
-    <PackageReleaseNotes></PackageReleaseNotes>
-    <PackageIconUrl></PackageIconUrl>
-    <PackageProjectUrl></PackageProjectUrl>
-    <PackageLicenseUrl></PackageLicenseUrl>
+    <PackageTags>
+    </PackageTags>
+    <PackageReleaseNotes>
+    </PackageReleaseNotes>
+    <PackageIconUrl>
+    </PackageIconUrl>
+    <PackageProjectUrl>
+    </PackageProjectUrl>
+    <PackageLicenseUrl>
+    </PackageLicenseUrl>
     <PackageRequireLicenseAcceptance>False</PackageRequireLicenseAcceptance>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\System.IO.Pipelines\System.IO.Pipelines.csproj" />
     <ProjectReference Include="..\System.IO.Pipelines.Tests\System.IO.Pipelines.Tests.csproj" />
   </ItemGroup>
-
   <ItemGroup>
-    <PackageReference Include="BenchmarkDotNet" Version="0.10.2.*" />
-  </ItemGroup>
+    <PackageReference Include="BenchmarkDotNet" Version="0.10.3" />
+<!--    <PackageReference Include="System.Memory" Version="4.4.0-beta-25103-02" />
+    <PackageReference Include="Microsoft.NETCore.Platforms" Version="2.0.0-beta-25022-02" /> -->
 
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Release\netcoreapp1.1\BDN.Generated\obj\Release\netcoreapp1.1" />
+  </ItemGroup>
 </Project>
