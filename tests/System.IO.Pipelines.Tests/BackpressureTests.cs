@@ -44,6 +44,9 @@ namespace System.IO.Pipelines.Tests
             writableBuffer.Advance(64);
             var flushAsync = writableBuffer.FlushAsync();
             Assert.False(flushAsync.IsCompleted);
+
+            // Release FlushAsync
+            _pipe.Reader.Advance(_pipe.Reader.ReadAsync().GetResult().Buffer.End);
         }
 
         [Fact]
@@ -131,6 +134,9 @@ namespace System.IO.Pipelines.Tests
             flushAsync = writableBuffer.FlushAsync();
 
             Assert.False(flushAsync.IsCompleted);
+
+            // Release FlushAsync
+            _pipe.Reader.Advance(_pipe.Reader.ReadAsync().GetResult().Buffer.End);
         }
 
         [Fact]

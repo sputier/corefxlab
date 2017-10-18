@@ -395,6 +395,11 @@ namespace System.IO.Pipelines
 
             lock (_sync)
             {
+                if (!_writerAwaitable.HasContinuation)
+                {
+                    PipelinesThrowHelper.ThrowInvalidOperationException(ExceptionResource.CompleteWriterActiveFlush, _writingState.Location);
+                }
+
                 completionCallbacks = _writerCompletion.TryComplete(exception);
                 awaitable = _readerAwaitable.Complete();
                 readerCompleted = _readerCompletion.IsCompleted;

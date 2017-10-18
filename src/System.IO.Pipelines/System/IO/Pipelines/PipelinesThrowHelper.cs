@@ -140,6 +140,9 @@ namespace System.IO.Pipelines
                 case ExceptionResource.CompleteWriterActiveWriter:
                     resourceString = "Can't complete writer while writing.";
                     break;
+                case ExceptionResource.CompleteWriterActiveFlush:
+                    resourceString = "Can't complete writer while flushing.";
+                    break;
                 case ExceptionResource.CompleteReaderActiveReader:
                     resourceString = "Can't complete reader while reading.";
                     break;
@@ -195,6 +198,7 @@ namespace System.IO.Pipelines
         NoWritingAllowed,
         NoReadingAllowed,
         CompleteWriterActiveWriter,
+        CompleteWriterActiveFlush,
         CompleteReaderActiveReader,
         AdvancingPastBufferSize,
         AdvancingWithNoBuffer,

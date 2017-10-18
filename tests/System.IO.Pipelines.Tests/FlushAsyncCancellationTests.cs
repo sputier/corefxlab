@@ -165,6 +165,10 @@ namespace System.IO.Pipelines.Tests
 
             Pipe.Writer.CancelPendingFlush();
             Assert.True(onCompletedCalled);
+
+
+            // Release FlushAsync
+            Pipe.Reader.Advance(Pipe.Reader.ReadAsync().GetResult().Buffer.End);
         }
 
         [Fact]
@@ -191,6 +195,9 @@ namespace System.IO.Pipelines.Tests
 
             cts.Cancel();
             Assert.True(onCompletedCalled);
+
+            // Release FlushAsync
+            Pipe.Reader.Advance(Pipe.Reader.ReadAsync().GetResult().Buffer.End);
         }
 
         [Fact]
