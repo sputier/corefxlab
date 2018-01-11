@@ -26,10 +26,11 @@ namespace System.Buffers
         private TSequence _sequence;
         private Position _currentPosition;
         private Position _nextPosition;
-               
+
         private int _consumedBytes;
         private bool _end;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public BufferReader(TSequence buffer)
         {
             _end = false;
@@ -38,7 +39,7 @@ namespace System.Buffers
             _sequence = buffer;
             _currentPosition = _sequence.Start;
             _nextPosition = _currentPosition;
-            _currentSpan = ReadOnlySpan<byte>.Empty;
+            _currentSpan = default;
             MoveNext();
         }
 
@@ -46,7 +47,11 @@ namespace System.Buffers
 
         public int Index => _index;
 
-        public Position Position => _sequence.Seek(_currentPosition, _index);
+        public Position Position
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _sequence.Seek(_currentPosition, _index); }
+        }
 
         public ReadOnlySpan<byte> CurrentSegment => _currentSpan;
 
@@ -72,7 +77,7 @@ namespace System.Buffers
                 return -1;
             }
 
-            var value = _currentSpan[_index];  
+            var value = _currentSpan[_index];
             _index++;
             _consumedBytes++;
 

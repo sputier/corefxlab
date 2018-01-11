@@ -91,7 +91,6 @@ namespace System.Buffers
 
         public ReadOnlyBuffer(OwnedMemory<byte> data, int offset, int length)
         {
-            
             if (data == null)
             {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.data);
@@ -269,11 +268,12 @@ namespace System.Buffers
             return new Enumerator(this);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Position Seek(Position origin, long offset)
         {
             if (offset < 0)
             {
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.offset);
             }
             return Seek(origin, BufferEnd, offset, false);
         }

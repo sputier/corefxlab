@@ -35,24 +35,13 @@ namespace System.IO.Pipelines
         }
 
         /// <summary>
-        /// Reference to the next block of data when the overall "active" bytes spans multiple blocks. At the point when the block is
-        /// leased Next is guaranteed to be null. Start, End, and Next are used together in order to create a linked-list of discontiguous
-        /// working memory. The "active" memory is grown when bytes are copied in, End is increased, and Next is assigned. The "active"
-        /// memory is shrunk when bytes are consumed, Start is increased, and blocks are returned to the pool.
-        /// </summary>
-        public BufferSegment NextSegment;
-
-        /// <summary>
-        /// Combined length of all segments before this
-        /// </summary>
-        public long VirtualIndex { get; private set; }
-
-        /// <summary>
         /// The buffer being tracked if segment owns the memory
         /// </summary>
         private OwnedMemory<byte> _ownedMemory;
 
         private int _end;
+
+        private BufferSegment _nextSegment;
 
         public void SetMemory(OwnedMemory<byte> buffer)
         {
@@ -70,7 +59,7 @@ namespace System.IO.Pipelines
             VirtualIndex = 0;
             Start = start;
             End = end;
-            NextSegment = null;
+            Next = null;
         }
 
         public void ResetMemory()
@@ -82,11 +71,9 @@ namespace System.IO.Pipelines
 
         public Memory<byte> AvailableMemory { get; private set; }
 
-        public Memory<byte> Memory { get; private set; }
-
         public int Length => End - Start;
 
-        public IBufferList Next => NextSegment;
+        public BufferSegment NextSegment => (BufferSegment) Next;
 
         /// <summary>
         /// If true, data should not be written into the backing block after the End offset. Data between start and end should never be modified
@@ -119,16 +106,9 @@ namespace System.IO.Pipelines
         {
             Debug.Assert(segment != null);
             Debug.Assert(Next == null);
-
-            NextSegment = segment;
-
-            segment = this;
-
-            while (segment.Next != null)
-            {
-                segment.NextSegment.VirtualIndex = segment.VirtualIndex + segment.Length;
-                segment = segment.NextSegment;
-            }
+            Debug.Assert(segment.Next == null);
+            Next = segment;
+            segment.VirtualIndex = VirtualIndex + Length;
         }
     }
 }

@@ -3,12 +3,12 @@
 
 namespace System.Collections.Sequences
 {
-    public interface IBufferList
+    public class IBufferList
     {
-        Memory<byte> Memory { get; }
+        public Memory<byte> Memory { get; protected set; }
 
-        IBufferList Next { get; }
+        public IBufferList Next { get; protected set; }
 
-        long VirtualIndex { get; }
+        public long VirtualIndex { get; protected set; }
     }
 }

@@ -27,7 +27,8 @@ namespace System.Buffers
         {
             throw GetNotSupportedException();
         }
-        
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public static void ThrowCursorOutOfBoundsException()
         {
             throw GetCursorOutOfBoundsException();

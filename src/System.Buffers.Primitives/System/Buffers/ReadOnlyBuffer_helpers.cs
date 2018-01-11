@@ -8,72 +8,77 @@ using System.Runtime.CompilerServices;
 
 namespace System.Buffers
 {
-    public readonly partial struct ReadOnlyBuffer 
+    public readonly partial struct ReadOnlyBuffer
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool TryGetBuffer(Position begin, Position end, out ReadOnlyMemory<byte> data, out Position next)
         {
             var segment = begin.Segment;
 
-            switch (segment)
+            if (segment is byte[] array)
             {
-                case null:
-                    data = default;
+                data = new Memory<byte>(array, begin.Index, end.Index - begin.Index);
+
+                if (segment != end.Segment)
+                {
+                    ThrowHelper.ThrowInvalidOperationException(ExceptionResource.EndCursorNotReached);
+                }
+
+                next = default;
+                return true;
+            }
+
+            if (segment is IBufferList bufferSegment)
+            {
+                var startIndex = begin.Index;
+                var endIndex = bufferSegment.Memory.Length;
+
+                if (segment == end.Segment)
+                {
+                    endIndex = end.Index;
                     next = default;
-                    return false;
-
-                case IBufferList bufferSegment:
-                    var startIndex = begin.Index;
-                    var endIndex = bufferSegment.Memory.Length;
-
-                    if (segment == end.Segment)
+                }
+                else
+                {
+                    var nextSegment = bufferSegment.Next;
+                    if (nextSegment == null)
                     {
-                        endIndex = end.Index;
+                        if (end.Segment != null)
+                        {
+                            ThrowHelper.ThrowInvalidOperationException(ExceptionResource.EndCursorNotReached);
+                        }
+
                         next = default;
                     }
                     else
                     {
-                        var nextSegment = bufferSegment.Next;
-                        if (nextSegment == null)
-                        {
-                            if (end.Segment != null)
-                            {
-                                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.EndCursorNotReached);
-                            }
-
-                            next = default;
-                        }
-                        else
-                        {
-                            next = new Position(nextSegment, 0);
-                        }
+                        next = new Position(nextSegment, 0);
                     }
+                }
 
-                    data = bufferSegment.Memory.Slice(startIndex, endIndex - startIndex);
+                data = bufferSegment.Memory.Slice(startIndex, endIndex - startIndex);
 
-                    return true;
+                return true;
+            }
 
+            if (segment is OwnedMemory<byte> ownedMemory)
+            {
+                data = ownedMemory.Memory.Slice(begin.Index, end.Index - begin.Index);
 
-                case OwnedMemory<byte> ownedMemory:
-                    data = ownedMemory.Memory.Slice(begin.Index, end.Index - begin.Index);
+                if (segment != end.Segment)
+                {
+                    ThrowHelper.ThrowInvalidOperationException(ExceptionResource.EndCursorNotReached);
+                }
 
-                    if (segment != end.Segment)
-                    {
-                        ThrowHelper.ThrowInvalidOperationException(ExceptionResource.EndCursorNotReached);
-                    }
+                next = default;
+                return true;
+            }
 
-                    next = default;
-                    return true;
-
-                case byte[] array:
-                    data = new Memory<byte>(array, begin.Index, end.Index - begin.Index);
-
-                    if (segment != end.Segment)
-                    {
-                        ThrowHelper.ThrowInvalidOperationException(ExceptionResource.EndCursorNotReached);
-                    }
-                    next = default;
-                    return true;
+            if (segment == null)
+            {
+                data = default;
+                next = default;
+                return false;
             }
 
             ThrowHelper.ThrowNotSupportedException();
@@ -179,26 +184,28 @@ namespace System.Buffers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void BoundsCheck(Position end, Position newCursor)
         {
-            switch (end.Segment)
+            if (end.Segment is byte[] _ || end.Segment is OwnedMemory<byte> _)
             {
-                case byte[] _:
-                case OwnedMemory<byte> _:
-                    if (newCursor.Index > end.Index)
-                    {
-                        ThrowHelper.ThrowCursorOutOfBoundsException();
-                    }
-                    return;
-                case IBufferList memoryList:
-                    var segment = (IBufferList)newCursor.Segment;
-                    if(segment.VirtualIndex - end.Index > memoryList.VirtualIndex - newCursor.Index)
-                    {
-                        ThrowHelper.ThrowCursorOutOfBoundsException();
-                    }
-                    return;
-                default:
+                if (newCursor.Index > end.Index)
+                {
                     ThrowHelper.ThrowCursorOutOfBoundsException();
-                    return;
+                }
+
+                return;
             }
+
+            if (end.Segment is IBufferList memoryList)
+            {
+                var segment = (IBufferList) newCursor.Segment;
+                if (segment.VirtualIndex - end.Index > memoryList.VirtualIndex - newCursor.Index)
+                {
+                    ThrowHelper.ThrowCursorOutOfBoundsException();
+                }
+
+                return;
+            }
+
+            ThrowHelper.ThrowCursorOutOfBoundsException();
         }
 
         private class ReadOnlyBufferSegment: IBufferList
